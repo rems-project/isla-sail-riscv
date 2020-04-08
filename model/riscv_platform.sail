@@ -6,6 +6,8 @@
    - it relies on externs to get platform address information and doesn't hardcode them
 */
 
+$ifndef SYMBOLIC
+
 val elf_tohost = {
   ocaml: "Elf_loader.elf_tohost",
   interpreter: "Elf_loader.elf_tohost",
@@ -60,6 +62,34 @@ val plat_clint_size = {ocaml: "Platform.clint_size", interpreter: "Platform.clin
 val plat_htif_tohost = {ocaml: "Platform.htif_tohost", c: "plat_htif_tohost", lem: "plat_htif_tohost"} : unit -> xlenbits
 function plat_htif_tohost () = to_bits(sizeof(xlen), elf_tohost ())
 // todo: fromhost
+
+$else
+
+register configuration rv_enable_pmp : bool = false
+register configuration rv_enable_dirty_update : bool = false
+register configuration rv_enable_misaligned_access : bool = false
+register configuration rv_mtval_has_illegal_inst_bits : bool = false
+register configuration rv_ram_base : xlenbits = EXTZ(0x8000_0000)
+register configuration rv_ram_size : xlenbits = EXTZ(0x400_0000)
+register configuration rv_rom_base : xlenbits = EXTZ(0x1000)
+register configuration rv_rom_size : xlenbits = EXTZ(0x100)
+register configuration rv_clint_base : xlenbits = EXTZ(0x200_0000)
+register configuration rv_clint_size : xlenbits = EXTZ(0xc0000)
+register configuration rv_htif_tohost : xlenbits = EXTZ(0x8000_1000)
+
+function plat_enable_pmp() -> bool = rv_enable_pmp
+function plat_enable_dirty_update() -> bool = rv_enable_dirty_update
+function plat_enable_misaligned_access() -> bool = rv_enable_misaligned_access
+function plat_mtval_has_illegal_inst_bits() -> bool = rv_mtval_has_illegal_inst_bits
+function plat_ram_base() -> xlenbits = rv_ram_base
+function plat_ram_size() -> xlenbits = rv_ram_size
+function plat_rom_base() -> xlenbits = rv_rom_base
+function plat_rom_size() -> xlenbits = rv_rom_size
+function plat_clint_base() -> xlenbits = rv_clint_base
+function plat_clint_size() -> xlenbits = rv_clint_size
+function plat_htif_tohost() -> xlenbits = rv_htif_tohost
+
+$endif
 
 val phys_mem_segments : unit -> list((xlenbits, xlenbits))
 function phys_mem_segments() =
@@ -117,7 +147,17 @@ function within_htif_readable forall 'n, 0 < 'n <= max_mem_access . (addr : xlen
 
 /* CLINT (Core Local Interruptor), based on Spike. */
 
+$ifndef SYMBOLIC
+
 val plat_insns_per_tick = {ocaml: "Platform.insns_per_tick", interpreter: "Platform.insns_per_tick", c: "plat_insns_per_tick", lem: "plat_insns_per_tick"} : unit -> int
+
+$else
+
+register configuration rv_insns_per_tick : int = 100
+
+function plat_insns_per_tick() -> int = rv_insns_per_tick
+
+$endif
 
 // assumes a single hart, since this typically is a vector of per-hart registers.
 register mtimecmp : bits(64)  // memory-mapped internal clint register.
@@ -257,8 +297,17 @@ function tick_clock() = {
 
 /* Basic terminal character I/O. */
 
+$ifndef SYMBOLIC
+
 val plat_term_write = {ocaml: "Platform.term_write", c: "plat_term_write", lem: "plat_term_write"} : bits(8) -> unit
 val plat_term_read  = {ocaml: "Platform.term_read",  c: "plat_term_read", lem: "plat_term_read"}  : unit -> bits(8)
+
+$else
+
+function plat_term_write(c: bits(8)) -> unit = ()
+function plat_term_read() -> bits(8) = undefined
+
+$endif
 
 /* Spike's HTIF device interface, which multiplexes the above MMIO devices. */
 

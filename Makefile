@@ -175,6 +175,9 @@ interpret: $(SAIL_SRCS) model/main.sail
 riscv.smt_model: $(SAIL_SRCS)
 	$(SAIL) -smt_serialize $(SAIL_FLAGS) $(SAIL_SRCS) -o riscv
 
+riscv64.ir: $(SAIL_SRCS) model/main.sail
+	$(ISLA_SAIL) $(ISLA_SAIL_FLAGS) $(SAIL_SRCS) model/main.sail -o riscv64
+
 cgen: $(SAIL_SRCS) model/main.sail
 	$(SAIL) -cgen $(SAIL_FLAGS) $(SAIL_SRCS) model/main.sail
 

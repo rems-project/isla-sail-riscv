@@ -31,9 +31,17 @@ function read_kind_of_flags (aq : bool, rl : bool, res : bool) -> option(read_ki
     (false, true, true)   => None()
   }
 
+function is_ifetch(t: AccessType(ext_access_type)) -> bool = {
+  match t {
+    Execute() => true,
+    _ => false
+  }
+}
+
 // only used for actual memory regions, to avoid MMIO effects
 function phys_mem_read forall 'n, 0 < 'n <= max_mem_access . (t : AccessType(ext_access_type), paddr : xlenbits, width : atom('n), aq : bool, rl: bool, res : bool, meta : bool) -> MemoryOpResult((bits(8 * 'n), mem_meta)) = {
   let result = (match read_kind_of_flags(aq, rl, res) {
+    Some(_) if is_ifetch(t) => Some(read_ram(Read_ifetch, paddr, width, meta)),
     Some(rk) => Some(read_ram(rk, paddr, width, meta)),
     None()   => None()
   }) : option((bits(8 * 'n), mem_meta));

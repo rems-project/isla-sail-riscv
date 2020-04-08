@@ -398,8 +398,8 @@ function clause execute (STORE(imm, rs2, rs1, width, aq, rl)) = {
                 (DOUBLE, 64) => mem_write_value(addr, 8, rs2_val,        aq, rl, false)
               };
               match (res) {
-                MemValue(true)  => RETIRE_SUCCESS,
-                MemValue(false) => internal_error("store got false from mem_write_value"),
+                MemValue(_)  => RETIRE_SUCCESS,
+                // MemValue(false) => internal_error("store got false from mem_write_value"),
                 MemException(e) => { handle_mem_exception(addr, e); RETIRE_FAIL }
               }
             }

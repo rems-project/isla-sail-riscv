@@ -29,7 +29,7 @@ function write_ram(wk, addr, width, data, meta) = {
    * metadata to ensure atomicity.
    */
   let ret : bool = __write_mem(wk, sizeof(xlen), addr, width, data);
-  if ret then __WriteRAM_Meta(addr, width, meta);
+  __WriteRAM_Meta(addr, width, meta);
   ret
 }
 
