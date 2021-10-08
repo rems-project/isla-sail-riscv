@@ -138,6 +138,8 @@ bitfield Misa : xlenbits = {
 }
 register misa : Misa
 
+$ifndef SYMBOLIC
+
 /* whether misa is R/W */
 val sys_enable_writable_misa = {c: "sys_enable_writable_misa", ocaml: "Platform.enable_writable_misa", _: "sys_enable_writable_misa"} : unit -> bool
 /* whether misa.c was enabled at boot */
@@ -146,6 +148,20 @@ val sys_enable_rvc = {c: "sys_enable_rvc", ocaml: "Platform.enable_rvc", _: "sys
 val sys_enable_fdext = {c: "sys_enable_fdext", ocaml: "Platform.enable_fdext", _: "sys_enable_fdext"} : unit -> bool
 /* whether the N extension was enabled at boot */
 val sys_enable_next = {c: "sys_enable_next", ocaml: "Platform.enable_next", _: "sys_enable_next"} : unit -> bool
+
+$else
+
+register configuration rv_enable_writable_misa : bool = true
+register configuration rv_enable_rvc : bool = true
+register configuration rv_enable_fdext : bool = false
+register configuration rv_enable_next : bool = false
+
+function sys_enable_writable_misa() -> bool = rv_enable_writable_misa
+function sys_enable_rvc() -> bool = rv_enable_rvc
+function sys_enable_fdext() -> bool = rv_enable_fdext
+function sys_enable_next() -> bool = rv_enable_next
+
+$endif
 
 /* This function allows an extension to veto a write to Misa
    if it would violate an alignment restriction on
