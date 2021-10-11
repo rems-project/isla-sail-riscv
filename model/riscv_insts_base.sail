@@ -195,6 +195,7 @@ function clause execute (BTYPE(imm, rs2, rs1, op)) = {
           handle_mem_exception(target, E_Fetch_Addr_Align());
           RETIRE_FAIL;
         } else {
+          __branch_announce(sizeof(xlen), target);
           set_next_pc(target);
           RETIRE_SUCCESS
         }
