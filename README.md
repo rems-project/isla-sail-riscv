@@ -1,3 +1,13 @@
+RISC-V Sail Model adapted for Isla
+==================================
+
+This is a mildly adapted version of the Sail specification for the
+RISC-V architecture for use with the Isla symbolic execution tool.
+The changes are not intended to be merged into the main model
+directly.
+
+The original README is below.
+
 RISCV Sail Model
 ================
 
