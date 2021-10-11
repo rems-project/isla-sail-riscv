@@ -91,15 +91,13 @@ function main () : unit -> unit = {
 
 $ifdef SYMBOLIC
 
-val isla_footprint : forall 'n, 'n in {16, 32}. bits('n) -> bool effect {barr, eamem, escape, exmem, rmem, rmemt, rreg, undef, wmv, wmvt, wreg}
+val isla_reset_registers = "reset_registers" : unit -> unit
 
-function isla_footprint(opcode) = {
-  ext_init ();
+val isla_footprint_no_init : forall 'n, 'n in {16, 32}. bits('n) -> bool effect {barr, eamem, escape, exmem, rmem, rmemt, rreg, undef, wmv, wmvt, wreg}
 
-  mstatus->MPRV() = 0b0;
-
+function isla_footprint_no_init(opcode) = {
   try {
-    init_model();
+    isla_reset_registers();
 
     check_cycle_count();
     let ast: ast = if length(opcode) == 16 then {
@@ -110,6 +108,22 @@ function isla_footprint(opcode) = {
     let _ = execute(ext_post_decode_hook(ast));
 
     true
+  } catch {
+    _ => false
+  }
+}
+
+val isla_footprint : forall 'n, 'n in {16, 32}. bits('n) -> bool effect {barr, eamem, escape, exmem, rmem, rmemt, rreg, undef, wmv, wmvt, wreg}
+
+function isla_footprint(opcode) = {
+  ext_init ();
+
+  mstatus->MPRV() = 0b0;
+
+  try {
+    init_model();
+
+    isla_footprint_no_init(opcode)
   } catch {
     _ => false
   }
