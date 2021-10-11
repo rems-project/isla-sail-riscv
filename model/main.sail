@@ -101,11 +101,14 @@ function isla_footprint_no_init(opcode) = {
 
     check_cycle_count();
     let ast: ast = if length(opcode) == 16 then {
+      nextPC = PC + 2;
       decodeCompressed(opcode)
     } else {
+      nextPC = PC + 4;
       decode(opcode)
     };
     let _ = execute(ext_post_decode_hook(ast));
+    tick_pc();
 
     true
   } catch {
