@@ -143,7 +143,7 @@ register configuration rv_rom_base : xlenbits = EXTZ(0x1000)
 register configuration rv_rom_size : xlenbits = EXTZ(0x100)
 register configuration rv_clint_base : xlenbits = EXTZ(0x200_0000)
 register configuration rv_clint_size : xlenbits = EXTZ(0xc0000)
-register configuration rv_htif_tohost : xlenbits = EXTZ(0x8000_1000)
+register configuration rv_htif_tohost : xlenbits = EXTZ(0x4000_1000)
 
 function plat_enable_pmp() -> bool = rv_enable_pmp
 function plat_enable_dirty_update() -> bool = rv_enable_dirty_update
